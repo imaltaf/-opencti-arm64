@@ -60,6 +60,8 @@ OpenCTI should now be running on your ARM64 device. You can access it via a web 
 ```sh
 http://localhost:8080
 ```
+# ScreenShot
+ ![alt text](image.png)
 
 # Building from Source
 
@@ -92,4 +94,5 @@ Special thanks to the OpenCTI team for their excellent work on the OpenCTI platf
 For questions, suggestions, or feedback, feel free to reach out:
 
 GitHub: imaltaf
+
 Email: altaf@codesec.me

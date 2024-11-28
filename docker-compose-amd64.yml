@@ -37,7 +37,7 @@ services:
       timeout: 10s
       retries: 50
   minio:
-    image: minio/minio:RELEASE.2024-05-28T17-19-04Z-cpuv1 # to troubleshoot compatibility issues with CPU
+    image: minio/minio:RELEASE.2024-05-28T17-19-04Z # Use "minio/minio:RELEASE.2024-05-28T17-19-04Z-cpuv1" to troubleshoot compatibility issues with CPU
     volumes:
       - s3data:/data
     ports:
@@ -70,7 +70,7 @@ services:
     image: opencti/platform:6.4.1
     environment:
       - NODE_OPTIONS=--max-old-space-size=8096
-      - APP__PORT=8007
+      - APP__PORT=8090
       - APP__BASE_URL=${OPENCTI_BASE_URL}
       - APP__ADMIN__EMAIL=${OPENCTI_ADMIN_EMAIL}
       - APP__ADMIN__PASSWORD=${OPENCTI_ADMIN_PASSWORD}
@@ -96,7 +96,7 @@ services:
       - PROVIDERS__LOCAL__STRATEGY=LocalStrategy
       - APP__HEALTH_ACCESS_KEY=${OPENCTI_HEALTHCHECK_ACCESS_KEY}
     ports:
-      - "8080:8080"
+      - "8090:8090"
     depends_on:
       redis:
         condition: service_healthy
@@ -108,14 +108,14 @@ services:
         condition: service_healthy
     restart: always
     healthcheck:
-      test:  ["CMD", "wget", "-qO-", "http://opencti:8080/health?health_access_key=${OPENCTI_HEALTHCHECK_ACCESS_KEY}"]
+      test:  ["CMD", "wget", "-qO-", "http://31.220.79.22:8090/health?health_access_key=${OPENCTI_HEALTHCHECK_ACCESS_KEY}"]
       interval: 10s
       timeout: 5s
       retries: 20
   worker:
     image: opencti/worker:6.4.1
     environment:
-      - OPENCTI_URL=http://opencti:8080
+      - OPENCTI_URL=http://31.220.79.22:8090
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - WORKER_LOG_LEVEL=info
     depends_on:
@@ -126,9 +126,9 @@ services:
       replicas: 3
     restart: always
   connector-export-file-stix:
-    image: codesec/connector-export-file-stix:latest
+    image: opencti/connector-export-file-stix:6.4.1
     environment:
-      - OPENCTI_URL=http://opencti:8080
+      - OPENCTI_URL=http://31.220.79.22:8090
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=${CONNECTOR_EXPORT_FILE_STIX_ID} # Valid UUIDv4
       - CONNECTOR_TYPE=INTERNAL_EXPORT_FILE
@@ -140,9 +140,9 @@ services:
       opencti:
         condition: service_healthy
   connector-export-file-csv:
-    image: codesec/connector-export-file-csv:latest
+    image: opencti/connector-export-file-csv:6.4.1
     environment:
-      - OPENCTI_URL=http://opencti:8080
+      - OPENCTI_URL=http://31.220.79.22:8090
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=${CONNECTOR_EXPORT_FILE_CSV_ID} # Valid UUIDv4
       - CONNECTOR_TYPE=INTERNAL_EXPORT_FILE
@@ -154,9 +154,9 @@ services:
       opencti:
         condition: service_healthy
   connector-export-file-txt:
-    image: codesec/connector-export-file-txt:latest
+    image: opencti/connector-export-file-txt:6.4.1
     environment:
-      - OPENCTI_URL=http://opencti:8080
+      - OPENCTI_URL=http://31.220.79.22:8090
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=${CONNECTOR_EXPORT_FILE_TXT_ID} # Valid UUIDv4
       - CONNECTOR_TYPE=INTERNAL_EXPORT_FILE
@@ -168,9 +168,9 @@ services:
       opencti:
         condition: service_healthy
   connector-import-file-stix:
-    image: codesec/connector-import-file-stix:latest
+    image: opencti/connector-import-file-stix:6.4.1
     environment:
-      - OPENCTI_URL=http://opencti:8080
+      - OPENCTI_URL=http://31.220.79.22:8090
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=${CONNECTOR_IMPORT_FILE_STIX_ID} # Valid UUIDv4
       - CONNECTOR_TYPE=INTERNAL_IMPORT_FILE
@@ -184,9 +184,9 @@ services:
       opencti:
         condition: service_healthy
   connector-import-document:
-    image: codesec/connector-import-document:latest
+    image: opencti/connector-import-document:6.4.1
     environment:
-      - OPENCTI_URL=http://opencti:8080
+      - OPENCTI_URL=http://31.220.79.22:8090
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=${CONNECTOR_IMPORT_DOCUMENT_ID} # Valid UUIDv4
       - CONNECTOR_TYPE=INTERNAL_IMPORT_FILE
@@ -203,9 +203,9 @@ services:
       opencti:
         condition: service_healthy
   connector-analysis:
-    image: codesec/connector-import-document:latest
+    image: opencti/connector-import-document:6.4.1
     environment:
-      - OPENCTI_URL=http://opencti:8080
+      - OPENCTI_URL=http://31.220.79.22:8090
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
       - CONNECTOR_ID=${CONNECTOR_ANALYSIS_ID} # Valid UUIDv4
       - CONNECTOR_TYPE=INTERNAL_ANALYSIS
@@ -216,7 +216,7 @@ services:
       - CONNECTOR_ONLY_CONTEXTUAL=false # Only extract data related to an entity (a report, a threat actor, etc.)
       - CONNECTOR_CONFIDENCE_LEVEL=15 # From 0 (Unknown) to 100 (Fully trusted)
       - CONNECTOR_LOG_LEVEL=info
-    restart: always 
+    restart: always
     depends_on:
       opencti:
         condition: service_healthy
@@ -226,4 +226,3 @@ volumes:
   s3data:
   redisdata:
   amqpdata:
-
