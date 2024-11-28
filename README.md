@@ -24,6 +24,8 @@ To get started, ensure you have the following:
 - Git installed
 - Basic knowledge of Docker and Docker Compose
 
+For a complete guide, visit the [Medium blog](https://medium.com/@imaltaf/installing-opencti-on-oracle-free-tier-arm64-07c20580868a).
+
 ## Installation
 
 ### 1. Clone the Repository
